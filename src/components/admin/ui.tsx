@@ -10,7 +10,7 @@ export function Card({ title, children, className = "" }: { title?: string; chil
   return <section className={`panel p-5 sm:p-6 ${className}`}>{title ? <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-sand">{title}</h2> : null}{children}</section>;
 }
 export function Scroll({ children }: { children: React.ReactNode }) { return <div className="-mx-5 overflow-x-auto px-5 sm:-mx-6 sm:px-6">{children}</div>; }
-export function Field({ label, name, defaultValue, type = "text", hint, ...rest }: { label: string; name: string; defaultValue?: string | number | null; type?: string; hint?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+export function Field({ label, name, defaultValue, type = "text", hint, ...rest }: { label: string; name: string; defaultValue?: string | number | null; type?: string; hint?: string } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue" | "name" | "type">) {
   return <div><label className="label" htmlFor={`f-${name}`}>{label}</label><input id={`f-${name}`} name={name} type={type} defaultValue={defaultValue ?? ""} className="field" {...rest} />{hint ? <p className="mt-1 text-[11px] text-dim">{hint}</p> : null}</div>;
 }
 export function Area({ label, name, defaultValue, rows = 3, hint, mono }: { label: string; name: string; defaultValue?: string | null; rows?: number; hint?: string; mono?: boolean }) {

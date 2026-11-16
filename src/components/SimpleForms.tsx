@@ -95,7 +95,7 @@ export function ProfileForm({ u }: { u: { firstName: string; lastName: string; p
 export function AddressForm() {
   const [s, action, pending] = useActionState(saveAddress, null);
   return (
-    <form action={action} className="grid gap-4 sm:grid-cols-2" key={s?.ok ? Date.now() : "f"}>
+    <form action={action} className="grid gap-4 sm:grid-cols-2" key={s?.ok ? "saved" : "f"}>
       <div><label className="label" htmlFor="a-lb">Label</label><input id="a-lb" name="label" defaultValue="Home" className="field" /></div>
       <div><label className="label" htmlFor="a-r">Recipient name</label><input id="a-r" name="recipient" required className="field" /></div>
       <div><label className="label" htmlFor="a-p">Mobile number</label><input id="a-p" name="phone" type="tel" required placeholder="082 123 4567" className="field" /></div>

@@ -14,6 +14,7 @@ import { cancelOrder } from "../src/lib/orders";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 let passed = 0;
+const RUN = Date.now().toString(36);
 const ok = (name: string) => { passed++; console.log("  ✓ " + name); };
 
 async function variantOf(name: string) {
@@ -50,31 +51,36 @@ async function main() {
   ok("unpaid order is not sent to the supplier");
 
   const cents = (await q1<{ amount_cents: number }>("SELECT amount_cents FROM payments WHERE id=$1", [a.paymentId]))!.amount_cents;
-  assert.equal((await applyPaymentResult({ paymentId: a.paymentId, providerRef: "T1", outcome: "succeeded", amountCents: cents - 100 })).ok, false);
+  assert.equal((await applyPaymentResult({ paymentId: a.paymentId, providerRef: `T1-${RUN}`, outcome: "succeeded", amountCents: cents - 100 })).ok, false);
   assert.equal((await fulfil(a.orderId))!.status, "pending");
   ok("payment with the wrong amount does not release the order");
 
-  await applyPaymentResult({ paymentId: a.paymentId, providerRef: "T1", outcome: "succeeded", amountCents: cents });
+  await applyPaymentResult({ paymentId: a.paymentId, providerRef: `T1-${RUN}`, outcome: "succeeded", amountCents: cents });
   f = (await fulfil(a.orderId))!;
   assert.equal(f.status, "submitted");
   assert.ok(f.supplier_order_ref?.startsWith("SBX-"));
   ok("confirmed payment submits the order and stores the supplier's reference");
 
-  await Promise.all([1, 2, 3].map(() => applyPaymentResult({ paymentId: a.paymentId, providerRef: "T1", outcome: "succeeded", amountCents: cents })));
+  await Promise.all([1, 2, 3].map(() => applyPaymentResult({ paymentId: a.paymentId, providerRef: `T1-${RUN}`, outcome: "succeeded", amountCents: cents })));
   await runSync();
   assert.equal(await supplierOrders(f.idempotency_key), 1);
   ok("replayed payment notifications do not create duplicate supplier orders");
 
+  const dup = await place("Ember Mini Pocket");
+  assert.equal((await applyPaymentResult({ paymentId: dup.paymentId, providerRef: `T1-${RUN}`, outcome: "succeeded" })).ok, false);
+  assert.equal((await fulfil(dup.orderId))!.status, "pending");
+  ok("a gateway reference cannot be reused to pay a second order");
+
   // 2. Declined payment
   const b = await place("Ember Mini Pocket");
-  await applyPaymentResult({ paymentId: b.paymentId, providerRef: "T2", outcome: "failed" });
+  await applyPaymentResult({ paymentId: b.paymentId, providerRef: `T2-${RUN}`, outcome: "failed" });
   assert.equal((await q1<{ status: string }>("SELECT status FROM orders WHERE id=$1", [b.orderId]))!.status, "payment_failed");
   assert.equal(await supplierOrders((await fulfil(b.orderId))!.idempotency_key), 0);
   ok("declined payment never reaches the supplier");
 
   // 3. Supplier rejects
   const c = await place("Ember Mini Pocket", "FAIL-SUPPLIER");
-  await applyPaymentResult({ paymentId: c.paymentId, providerRef: "T3", outcome: "succeeded" });
+  await applyPaymentResult({ paymentId: c.paymentId, providerRef: `T3-${RUN}`, outcome: "succeeded" });
   f = (await fulfil(c.orderId))!;
   assert.equal(f.status, "failed");
   assert.equal(f.supplier_order_ref, null);
@@ -85,7 +91,7 @@ async function main() {
 
   // 4. Timeout with ambiguous outcome → reconcile, no duplicate
   const d = await place("Ember Mini Pocket", "TIMEOUT-SUPPLIER");
-  await applyPaymentResult({ paymentId: d.paymentId, providerRef: "T4", outcome: "succeeded" });
+  await applyPaymentResult({ paymentId: d.paymentId, providerRef: `T4-${RUN}`, outcome: "succeeded" });
   f = (await fulfil(d.orderId))!;
   assert.equal(f.status, "unknown");
   assert.equal(f.supplier_order_ref, null);
@@ -98,7 +104,7 @@ async function main() {
 
   // 5. Transient failure → retry
   const e = await place("Ember Mini Pocket", "FLAKY-SUPPLIER");
-  await applyPaymentResult({ paymentId: e.paymentId, providerRef: "T5", outcome: "succeeded" });
+  await applyPaymentResult({ paymentId: e.paymentId, providerRef: `T5-${RUN}`, outcome: "succeeded" });
   assert.equal((await fulfil(e.orderId))!.status, "failed");
   await due(e.orderId);
   await runSync();
@@ -107,7 +113,7 @@ async function main() {
 
   // 6. Cancel before dispatch → supplier cancel + refund
   const g = await place("Zenith Universal Ceiling Mount");
-  await applyPaymentResult({ paymentId: g.paymentId, providerRef: "T6", outcome: "succeeded" });
+  await applyPaymentResult({ paymentId: g.paymentId, providerRef: `T6-${RUN}`, outcome: "succeeded" });
   const cr = await cancelOrder(g.orderId, null, "customer changed mind");
   assert.ok(cr.ok, cr.message);
   const go = (await q1<{ status: string; refunded_cents: number; total_cents: number }>("SELECT status, refunded_cents, total_cents FROM orders WHERE id=$1", [g.orderId]))!;

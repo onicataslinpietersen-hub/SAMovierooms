@@ -39,7 +39,7 @@ export default async function AdminHome({ searchParams }: { searchParams: Promis
           <Card title="Revenue by day">
             {daily.length ? (
               <div className="flex h-44 items-end gap-1" role="img" aria-label="Daily revenue bar chart">
-                {daily.map((d) => <div key={+d.day} className="group relative flex-1"><div className="rounded-t bg-gradient-to-t from-ember to-amber transition-opacity group-hover:opacity-80" style={{ height: `${Math.max(3, (Number(d.revenue) / max) * 168)}px` }} /><span className="pointer-events-none absolute -top-9 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-smoke px-2 py-1 text-[10px] group-hover:block">{d.day.toLocaleDateString("en-ZA", { day: "numeric", month: "short" })} · {zar(Number(d.revenue))}</span></div>)}
+                {daily.map((d) => <div key={+d.day} className="group relative max-w-12 flex-1"><div className="rounded-t bg-gradient-to-t from-ember to-amber transition-opacity group-hover:opacity-80" style={{ height: `${Math.max(3, (Number(d.revenue) / max) * 168)}px` }} /><span className="pointer-events-none absolute -top-9 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-smoke px-2 py-1 text-[10px] group-hover:block">{d.day.toLocaleDateString("en-ZA", { day: "numeric", month: "short" })} · {zar(Number(d.revenue))}</span></div>)}
               </div>
             ) : <p className="text-sm text-ash">No paid orders in this period yet.</p>}
           </Card>

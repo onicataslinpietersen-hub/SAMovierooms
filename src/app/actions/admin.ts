@@ -59,11 +59,11 @@ export async function setProductStatus(_: AdminResult, fd: FormData): Promise<Ad
 export async function saveProduct(_: AdminResult, fd: FormData): Promise<AdminResult> {
   const u = await requireStaff();
   const id = str(fd, "id");
-  let specs: unknown, images: unknown;
+  let specs: unknown;
   try { specs = JSON.parse(str(fd, "specs") || "{}"); } catch { return { ok: false, message: "Specifications must be valid JSON." }; }
   if (typeof specs !== "object" || specs === null || Array.isArray(specs)) return { ok: false, message: "Specifications must be a JSON object." };
-  images = str(fd, "images").split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const [url, alt] = l.split("|").map((x) => x.trim()); return { url, alt: alt ?? "" }; });
-  if ((images as { url: string }[]).some((i) => !/^https:\/\//.test(i.url))) return { ok: false, message: "Image URLs must start with https://" };
+  const images = str(fd, "images").split("\n").map((l) => l.trim()).filter(Boolean).map((l) => { const [url, alt] = l.split("|").map((x) => x.trim()); return { url, alt: alt ?? "" }; });
+  if (images.some((i) => !/^https:\/\//.test(i.url))) return { ok: false, message: "Image URLs must start with https://" };
   const video = str(fd, "videoUrl");
   if (video && !/^https:\/\//.test(video)) return { ok: false, message: "Video URL must start with https://" };
   const name = str(fd, "name");

@@ -39,7 +39,7 @@ export function Hero() {
       </motion.div>
 
       {/* legibility gradients */}
-      <div className="absolute inset-0 bg-[radial-gradient(90%_70%_at_30%_55%,rgba(7,6,5,0.78),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(90%_70%_at_30%_55%,rgba(7,6,5,0.78),transparent_70%)] max-md:bg-[linear-gradient(180deg,rgba(7,6,5,0.25)_0%,rgba(7,6,5,0.55)_40%,rgba(7,6,5,0.9)_75%)]" />
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-coal to-transparent" />
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/70 to-transparent" />
 

@@ -50,7 +50,15 @@ export async function applyPaymentResult(r: { paymentId: string; providerRef: st
     return { ok: true, note: r.outcome };
   }
   // Compare-and-set: only one caller wins.
-  const won = await q1<{ id: string }>("UPDATE payments SET status='succeeded', provider_ref=$2, fee_cents=COALESCE($3, fee_cents), raw=$4::jsonb, updated_at=now() WHERE id=$1 AND status <> 'succeeded' RETURNING id", [pay.id, r.providerRef, r.feeCents ?? null, JSON.stringify(r.raw ?? {})]);
+  let won: { id: string } | null;
+  try {
+    won = await q1<{ id: string }>("UPDATE payments SET status='succeeded', provider_ref=$2, fee_cents=COALESCE($3, fee_cents), raw=$4::jsonb, updated_at=now() WHERE id=$1 AND status <> 'succeeded' RETURNING id", [pay.id, r.providerRef, r.feeCents ?? null, JSON.stringify(r.raw ?? {})]);
+  } catch (e) {
+    // One gateway transaction can settle only one payment (unique index on provider + provider_ref).
+    if ((e as { code?: string }).code !== "23505") throw e;
+    await alert("payment_ref_reused", `Gateway reference ${r.providerRef} was already used for another payment. Payment ${pay.id} NOT accepted.`, { orderId: pay.order_id, severity: "critical" });
+    return { ok: false, note: "gateway reference already used" };
+  }
   if (!won) return { ok: true, note: "already succeeded (race)" };
   const order = await q1<{ id: string; number: string; access_token: string; email: string; total_cents: number; discount_code: string | null }>(
     "UPDATE orders SET status='paid', paid_at=now(), payment_fee_cents=COALESCE($2, payment_fee_cents) WHERE id=$1 AND status IN ('pending_payment','payment_failed') RETURNING id, number, access_token, email, total_cents, discount_code", [pay.order_id, r.feeCents ?? null]);
