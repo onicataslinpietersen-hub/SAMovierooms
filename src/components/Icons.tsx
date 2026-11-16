@@ -1,0 +1,18 @@
+const base = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
+type P = { className?: string };
+export const IconCart = (p: P) => <svg {...base} {...p}><path d="M5 7h14l-1.4 9.2a2 2 0 0 1-2 1.8H8.4a2 2 0 0 1-2-1.8L5 7Z" /><path d="M9 7V6a3 3 0 0 1 6 0v1" /></svg>;
+export const IconUser = (p: P) => <svg {...base} {...p}><circle cx="12" cy="8" r="3.6" /><path d="M4.5 20a7.5 7.5 0 0 1 15 0" /></svg>;
+export const IconSearch = (p: P) => <svg {...base} {...p}><circle cx="11" cy="11" r="6.5" /><path d="m20 20-3.6-3.6" /></svg>;
+export const IconMenu = (p: P) => <svg {...base} {...p}><path d="M4 7h16M4 12h16M4 17h16" /></svg>;
+export const IconClose = (p: P) => <svg {...base} {...p}><path d="m6 6 12 12M18 6 6 18" /></svg>;
+export const IconHeart = ({ filled, ...p }: P & { filled?: boolean }) => <svg {...base} {...p} fill={filled ? "currentColor" : "none"}><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.500 15.4 12 20 12 20Z" /></svg>;
+export const IconArrow = (p: P) => <svg {...base} {...p}><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
+export const IconCheck = (p: P) => <svg {...base} {...p}><path d="m5 12.5 4.5 4.5L19 7.500" /></svg>;
+export const IconTruck = (p: P) => <svg {...base} {...p}><path d="M3 6.5h11v10H3zM14 10h4l3 3.2v3.3h-7" /><circle cx="7.500" cy="17.500" r="1.8" /><circle cx="17.500" cy="17.500" r="1.8" /></svg>;
+export const IconShield = (p: P) => <svg {...base} {...p}><path d="M12 3.500 5 6v5.500c0 4.300 2.900 7.400 7 9 4.100-1.600 7-4.700 7-9V6l-7-2.500Z" /><path d="m9 12 2.200 2.200L15 10.400" /></svg>;
+export const IconSpark = (p: P) => <svg {...base} {...p}><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M15 15l3 3M18 6l-3 3M9 15l-3 3" /></svg>;
+export const IconLock = (p: P) => <svg {...base} {...p}><rect x="5" y="10.500" width="14" height="10" rx="2.500" /><path d="M8 10.500V8a4 4 0 0 1 8 0v2.500" /></svg>;
+export const IconStar = ({ filled = true, ...p }: P & { filled?: boolean }) => <svg {...base} {...p} fill={filled ? "currentColor" : "none"} strokeWidth={1.2}><path d="m12 3.800 2.500 5.200 5.700.800-4.100 4 1 5.700-5.100-2.700-5.100 2.700 1-5.700-4.100-4 5.700-.800L12 3.800Z" /></svg>;
+export const IconInfo = (p: P) => <svg {...base} {...p}><circle cx="12" cy="12" r="8.500" /><path d="M12 11v5M12 8h.01" /></svg>;
+export const IconPlug = (p: P) => <svg {...base} {...p}><path d="M9 3v5M15 3v5M6.500 8h11v3.500a5.500 5.500 0 0 1-11 0V8ZM12 17v4" /></svg>;
+export const IconBox = (p: P) => <svg {...base} {...p}><path d="m3.500 7.500 8.500-4 8.500 4v9l-8.500 4-8.500-4v-9Z" /><path d="m3.500 7.500 8.500 4 8.500-4M12 11.500v9" /></svg>;
